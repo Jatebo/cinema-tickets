@@ -8,9 +8,9 @@ Provided the appropriate criteria are fulfilled, the private methods will calcul
 
 Exceptions are thrown if:
 
-Tickets (not seats) exceed 20
-No Adult tickets are purchased when attempting to purchase child/infant tickets
-Account Number is not a positive integer
-No ticket requests are sent or the ticketTypeRequests array is empty
-The total number of tickets requested in the ticket requests is 0
-Not enough Adult tickets are requested for the amount of infants that require a lap to be seated on
+- Tickets (not seats) exceed 20
+- No Adult tickets are purchased when attempting to purchase child/infant tickets
+- Account Number is not a positive integer
+- No ticket requests are sent or the ticketTypeRequests array is empty
+- The total number of tickets requested in the ticket requests is 0
+- Not enough Adult tickets are requested for the amount of infants that require a lap to be seated on
