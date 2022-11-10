@@ -8,6 +8,16 @@ export default class TicketService {
    */
 
   purchaseTickets(accountId, ...ticketTypeRequests) {
+    if (typeof accountId !== 'number' || accountId <= 0) {
+      throw new InvalidPurchaseException(
+        'accountId must be an integer greater than 0'
+      );
+    }
+
+    if (!ticketTypeRequests || ticketTypeRequests.length === 0) {
+      throw new InvalidPurchaseException('No ticket requests received');
+    }
+
     const requests = { adult: 0, child: 0, infant: 0 };
 
     ticketTypeRequests.forEach((request) => {
@@ -16,10 +26,33 @@ export default class TicketService {
       requests[type] = value;
     });
 
-    const totalCharges = this.#calculateTicketCharges(requests);
-    new TicketPaymentService().makePayment(accountId, totalCharges);
+    if (requests.adult + requests.child + requests.infant === 0) {
+      throw new InvalidPurchaseException(
+        'At least one ticket must be requested'
+      );
+    }
 
+    if (requests.adult === 0 && (requests.child > 0 || requests.infant > 0)) {
+      throw new InvalidPurchaseException(
+        'Infants/Children must be accompanied by an adult'
+      );
+    }
+
+    if (requests.adult < requests.infant) {
+      throw new InvalidPurchaseException(
+        'There must be no more than one infant per adult'
+      );
+    }
+
+    if (requests.adult + requests.child + requests.infant > 20) {
+      throw new InvalidPurchaseException(
+        'A maximum of 20 tickets can be bought at a time'
+      );
+    }
+    const totalCharges = this.#calculateTicketCharges(requests);
     const totalSeats = this.#calculateTotalSeats(requests);
+
+    new TicketPaymentService().makePayment(accountId, totalCharges);
     new SeatReservationService().reserveSeat(accountId, totalSeats);
   }
 
@@ -33,10 +66,3 @@ export default class TicketService {
     return adult + child;
   }
 }
-
-// Error handling to cover:
-
-// Greater than 20 tickets being requested
-// child/infant without adult
-// more infants than adults (infants must sit on adult lap)
-// ID number is not a number or less than 1
